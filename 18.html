@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seventeen音樂作品介紹</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+h1 {
+  text-align: center;
+}
+    .container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      width: 100%;
+    }
+    .category {
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      transition: transform 0.2s;
+      aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+    }
+    .category:hover {
+      transform: scale(1.1);
+      cursor: pointer;
+    }
+    .category img {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 80%;
+      border-radius: 20px;
+    }
+    .category h2 {
+      font-size: 24px;
+      color: #333;
+    }
+    .category .type {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Seventeen音樂作品介紹</h1>
+  <div class="container">
+    <!-- 正規專輯 -->
+    <div class="category" onclick="window.location.href='19.html';">
+      <h2>正規專輯</h2>
+    </div>
+    <!-- 特別專輯 -->
+    <div class="category" onclick="window.location.href='25.html';">
+      <h2>特別專輯</h2>
+    </div>
+    <!-- 迷你專輯 -->
+    <div class="category" onclick="window.location.href='28.html';">
+      <h2>迷你專輯</h2>
+    </div>
+    <!-- 單曲專輯 -->
+    <div class="category" onclick="window.location.href='41.html';">
+      <h2>單曲專輯</h2>
+    </div>
+    <!-- EP -->
+    <div class="category" onclick="window.location.href='42.html';">
+      <h2>EP</h2>
+    </div>
+    <!-- 精選專輯 -->
+    <div class="category" onclick="window.location.href='43.html';">
+      <h2>精選專輯</h2>
+    </div>
+  </div>
+</body>
+</html>

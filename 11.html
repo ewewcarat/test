@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seventeen Member Profile</title>
+    <style>
+        /* CSS 样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            position: relative;
+        }
+
+        body:before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #ffb6c1, #6fa4d8); /* 粉晶色到寧靜藍 */
+            animation: animateBackground 10s ease alternate infinite; /* 背景動畫 */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .profile-pic {
+            max-width: 200px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.7);
+        }
+
+        .profile-details {
+            text-align: center;
+        }
+
+        .profile-details h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: color 0.3s ease;
+        }
+
+        .profile-details h1:hover {
+            color: #ff69b4;
+        }
+
+        .profile-details p {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .profile-details p:hover {
+            color: #ff69b4;
+        }
+
+        /* 添加装饰性分割线 */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background-color: #ccc;
+            margin: 20px 0;
+        }
+
+        /* 添加带有圆角和阴影的盒子 */
+        .info-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* 照片輪播器的樣式 */
+        .photos-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .slideshow-container {
+            max-width: 55%; /* 修改寬度 */
+            margin: 0 auto;
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .slideshow-container img {
+            width: 90%;
+            height: 520px;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 个人介绍部分 -->
+<img class="profile-pic" src="images/photo69.jpg" alt="Member Photo">
+        <div class="profile-details">
+            <h1>全圓佑</h1>
+            <p>Nickname: 幻聽男</p>
+            <p>Position: 副Rapper</p>
+            <p>Subunit: Hip-hop Team</p>
+            <p>Birthday: 1996/7/17</p>
+            <p>Height: 182cm</p>
+            <p>Zodiac sign: 巨蟹座</p>
+            <p>Nationality: 韓國籍</p>
+
+        </div>
+        <div class="divider"></div>
+        <div class="info-box">
+            <h2>About</h2>
+            <p class="bio">Wonwoo（韓語：전원우），1996年7月17日出生於韓國首爾特別市。作為SEVENTEEN的rapper和副唱之一，他以深邃的歌聲和饒舌風格在團體中嶄露頭角。</p>
+        </div>
+        <div class="info-box">
+            <h2>More Information</h2>
+            <p>Wonwoo在音樂上展現了獨特的才華，他的歌聲深情而富有穿透力，每一次的表演都能引起粉絲的共鳴。此外，他還積極參與多個公益活動，展現了他的社會責任感和關懷精神。</p>
+        </div>
+        <!-- 添加照片輪播器 -->
+        <div class="photos-container">
+            <div class="slideshow-container">
+       <img src="images/photo7.jpg" alt="Photo 7">
+        <img src="images/photo63.jpg" alt="Photo 63">
+        <img src="images/photo64.jpg" alt="Photo 64">
+        <img src="images/photo66.jpg" alt="Photo 66">
+        <img src="images/photo68.jpg" alt="Photo 68">
+        <img src="images/photo57.jpg" alt="Photo 57">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频部分 -->
+    <div class="container">
+        <div class="info-box">
+            <h2>Featured Video</h2>
+            <div class="video-container">
+               <iframe width="750" height="400" src="https://www.youtube.com/embed/tQK9sHT7j94?si=03eCAJAWbuUHcqGX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 代码 -->
+    <script>
+        // 照片輪播器
+        var slideIndex = 0;
+        carousel();
+
+        function carousel() {
+            var i;
+            var slides = document.querySelectorAll('.slideshow-container img');
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}
+            slides[slideIndex-1].style.display = "block";
+            setTimeout(carousel, 2000); // Change image every 2 seconds
+        }
+    </script>
+</body>
+</html>

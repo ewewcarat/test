@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seventeen 獲獎紀錄</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+    }
+    .title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 32px;
+      color: #333;
+    }
+    .filters {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .filters select {
+      margin: 0 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .award {
+      position: relative;
+    }
+    .award:hover .award-image {
+      display: block;
+    }
+.award-image {
+  display: none;
+  position: absolute;
+  background-color: transparent; /* 將背景色設置為透明 */
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  box-shadow:none;
+  z-index: 1;
+  top: 100%;
+  left: 0;
+  width: 20px; /* 固定寬度 */
+  height: auto; /* 自動調整高度以保持圖片比例 */
+}
+.award img {
+  width: 100px; /* 修改為你想要的寬度 */
+  height: auto; /* 自動調整高度以保持圖片比例 */
+  transition: transform 0.3s ease; /* 添加動畫效果 */
+}
+
+img {
+  width: 100px; /* 修改為你想要的寬度 */
+  height: auto; /* 自動調整高度以保持圖片比例 */
+}
+/* 原始圖片大小 */
+.img-container img {
+  width: 200px;
+  height: auto;
+  transition: transform 0.3s ease; /* 添加動畫效果 */
+}
+
+/* 滑鼠懸停時放大 */
+.award img:hover {
+  transform: scale(4.0); /* 放大 4 倍 */
+}
+    .award-image p {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Seventeen 獲獎紀錄</h1>
+    <div class="filters">
+      <select id="yearFilter" onchange="filterAwards()">
+        <option value="all">所有年份</option>
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+      </select>
+      <select id="categoryFilter" onchange="filterAwards()">
+        <option value="all">所有類別</option>
+        <option value="Mnet Asian Music Awards (MAMA)">Mnet Asian Music Awards (MAMA)</option>
+        <option value="Golden Disc Awards">Golden Disc Awards</option>
+        <option value="Seoul Music Awards">Seoul Music Awards</option>
+        <option value="Asia Artist Awards">Asia Artist Awards</option>
+        <option value="The Fact Music Awards">The Fact Music Awards</option>
+        <option value="Japan Gold Disc Awards">Japan Gold Disc Awards</option>
+        <option value="日本唱片大獎 (Japan Record Awards)">日本唱片大獎 (Japan Record Awards)</option>
+        <option value="Genie Music Awards">Genie Music Awards</option>
+        <option value="Hanteo Music Awards">Hanteo Music Awards</option>
+        <option value="Melon Music Awards">Melon Music Awards</option>
+        <option value="Circle Chart Music Awards">Circle Chart Music Awards</option>
+        <option value="V Live Awards">V Live Awards</option>
+        <option value="Korea Cable TV Awards">Korea Cable TV Awards</option>
+        <option value="Asia Model Awards">Asia Model Awards</option>
+      </select>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>年份</th>
+          <th>獎項名稱</th>
+          <th>類別</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Mnet Asian Music Awards (MAMA) -->
+        <tr data-year="2016" data-category="Mnet Asian Music Awards (MAMA)">
+          <td>2016</td>
+          <td>世界表演者獎</td>
+          <td>Mnet Asian Music Awards (MAMA)</td>
+        </tr>
+        <tr data-year="2017" data-category="Mnet Asian Music Awards (MAMA)">
+          <td>2017</td>
+          <td>最佳男團舞蹈表演：《Don’t Wanna Cry》</td>
+          <td>Mnet Asian Music Awards (MAMA)</td>
+                 </tr>
+        <tr data-year="2018" data-category="Mnet Asian Music Awards (MAMA)">
+          <td>2018</td>
+          <td>最佳男團舞蹈表演：《Oh My!》</td>
+          <td>Mnet Asian Music Awards (MAMA)</td>
+                  </tr>
+        <!-- Golden Disc Awards -->
+        <tr data-year="2016" data-category="Golden Disc Awards">
+          <td>2016</td>
+          <td>新人獎</td>
+          <td>Golden Disc Awards</td>
+                 </tr>
+        <tr data-year="2017" data-category="Golden Disc Awards">
+          <td>2017</td>
+          <td>唱片本賞：《Love & Letter》</td>
+          <td>Golden Disc Awards</td>
+        </tr>
+        <tr data-year="2018" data-category="Golden Disc Awards">
+          <td>2018</td>
+          <td>唱片本賞：《TEEN, AGE》</td>
+          <td>Golden Disc Awards</td>
+        </tr>
+        <tr data-year="2019" data-category="Golden Disc Awards">
+          <td>2019</td>
+          <td>唱片本賞：《YOU MAKE MY DAY》</td>
+          <td>Golden Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2020" data-category="Golden Disc Awards">
+          <td>2020</td>
+          <td>唱片本賞：《An Ode》</td>
+          <td>Golden Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2021" data-category="Golden Disc Awards">
+          <td>2021</td>
+          <td>唱片本賞：《Heng:garæ》</td>
+          <td>Golden Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2022" data-category="Golden Disc Awards">
+          <td>2022</td>
+          <td>唱片本賞：《Attacca》</td>
+          <td>Golden Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="Golden Disc Awards">
+          <td>2023</td>
+          <td>唱片本賞：《Face the Sun》</td>
+          <td>Golden Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="Golden Disc Awards">
+          <td>2023</td>
+          <td>Best Performance Award</td>
+          <td>Golden Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Seoul Music Awards -->
+        <tr data-year="2016" data-category="Seoul Music Awards">
+          <td>2016</td>
+          <td>新人獎</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2017" data-category="Seoul Music Awards">
+          <td>2017</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2018" data-category="Seoul Music Awards">
+          <td>2018</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2019" data-category="Seoul Music Awards">
+          <td>2019</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2020" data-category="Seoul Music Awards">
+          <td>2020</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2021" data-category="Seoul Music Awards">
+          <td>2021</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2022" data-category="Seoul Music Awards">
+          <td>2022</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="Seoul Music Awards">
+          <td>2023</td>
+          <td>本賞（Bonsang）</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2024" data-category="Seoul Music Awards">
+          <td>2024</td>
+          <td>韓流特別獎</td>
+          <td>Seoul Music Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Asia Artist Awards -->
+        <tr data-year="2016" data-category="Asia Artist Awards">
+          <td>2016</td>
+          <td>最佳音樂明星獎</td>
+          <td>Asia Artist Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2017" data-category="Asia Artist Awards">
+          <td>2017</td>
+          <td>最佳音樂藝人獎</td>
+          <td>Asia Artist Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2018" data-category="Asia Artist Awards">
+          <td>2018</td>
+          <td>最佳音樂藝人獎</td>
+          <td>Asia Artist Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2019" data-category="Asia Artist Awards">
+          <td>2019</td>
+          <td>年度藝人獎</td>
+          <td>Asia Artist Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2021" data-category="Asia Artist Awards">
+          <td>2021</td>
+          <td>大賞</td>
+          <td>Asia Artist Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2022" data-category="Asia Artist Awards">
+          <td>2022</td>
+          <td>大賞</td>
+          <td>Asia Artist Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- The Fact Music Awards -->
+        <tr data-year="2020" data-category="The Fact Music Awards">
+          <td>2020</td>
+          <td>年度藝人</td>
+          <td>The Fact Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2021" data-category="The Fact Music Awards">
+          <td>2021</td>
+          <td>年度藝人</td>
+          <td>The Fact Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="The Fact Music Awards">
+          <td>2023</td>
+          <td>年度藝人</td>
+          <td>The Fact Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="The Fact Music Awards">
+          <td>2023</td>
+          <td>大賞</td>
+          <td>The Fact Music Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- 國際主要獎項 -->
+        <!-- Japan Gold Disc Awards -->
+        <tr data-year="2019" data-category="Japan Gold Disc Awards">
+          <td>2019</td>
+          <td>年度新藝人（亞洲）</td>
+          <td>Japan Gold Disc Awards</td>
+                    <td></td>
+        </tr>
+        <tr data-year="2021" data-category="Japan Gold Disc Awards">
+          <td>2021</td>
+          <td>最佳3專輯（亞洲）：《24H》</td>
+          <td>Japan Gold Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2022" data-category="Japan Gold Disc Awards">
+          <td>2022</td>
+          <td>最佳3專輯（亞洲）：《Attacca》</td>
+          <td>Japan Gold Disc Awards</td>
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="Japan Gold Disc Awards">
+          <td>2023</td>
+          <td>最佳3專輯（亞洲）：《Face the Sun》</td>
+          <td>Japan Gold Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="Japan Gold Disc Awards">
+          <td>2023</td>
+          <td>最佳3專輯（亞洲）：《Dream》</td>
+          <td>Japan Gold Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2023" data-category="Japan Gold Disc Awards">
+          <td>2023</td>
+          <td>年度專輯（亞洲）：《Dream》</td>
+          <td>Japan Gold Disc Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- 日本唱片大獎 (Japan Record Awards) -->
+        <tr data-year="2022" data-category="日本唱片大獎 (Japan Record Awards)">
+          <td>2022</td>
+          <td>特別國際音樂獎</td>
+          <td>日本唱片大獎 (Japan Record Awards)</td>
+
+
+          <td></td>
+        </tr>
+        <!-- 其他獎項和提名 -->
+        <!-- Genie Music Awards -->
+        <tr data-year="multiple" data-category="Genie Music Awards">
+          <td>多次</td>
+          <td>最佳男團（多次提名）</td>
+          <td>Genie Music Awards</td>
+          <td></td>
+        </tr>
+        <tr data-year="multiple" data-category="Genie Music Awards">
+          <td>多次</td>
+          <td>年度藝人（多次提名）</td>
+          <td>Genie Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="multiple" data-category="Genie Music Awards">
+          <td>多次</td>
+          <td>全球人氣獎（多次提名）</td>
+          <td>Genie Music Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Hanteo Music Awards -->
+        <tr data-year="2021" data-category="Hanteo Music Awards">
+          <td>2021</td>
+          <td>初動記錄獎</td>
+          <td>Hanteo Music Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Melon Music Awards -->
+        <tr data-year="2016" data-category="Melon Music Awards">
+          <td>2016</td>
+          <td>MBC音樂明星獎</td>
+          <td>Melon Music Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Circle Chart Music Awards -->
+        <tr data-year="2020" data-category="Circle Chart Music Awards">
+          <td>2020</td>
+          <td>年度專輯</td>
+          <td>Circle Chart Music Awards</td>
+
+          <td></td>
+        </tr>
+        <tr data-year="2021" data-category="Circle Chart Music Awards">
+          <td>2021</td>
+          <td>年度專輯</td>
+          <td>Circle Chart Music Awards</td>
+ 
+          <td></td>
+        </tr>
+        <tr data-year="2021" data-category="Circle Chart Music Awards">
+          <td>2021</td>
+          <td>觀众票選人氣獎</td>
+          <td>Circle Chart Music Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- V Live Awards -->
+        <tr data-year="2017" data-category="V Live Awards">
+          <td>2017</td>
+          <td>全球藝人TOP 10</td>
+          <td>V Live Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Korea Cable TV Awards -->
+        <tr data-year="2017" data-category="Korea Cable TV Awards">
+          <td>2017</td>
+          <td>表演獎</td>
+          <td>Korea Cable TV Awards</td>
+
+          <td></td>
+        </tr>
+        <!-- Asia Model Awards -->
+        <tr data-year="2016" data-category="Asia Model Awards">
+          <td>2016</td>
+          <td>人氣歌手獎</td>
+          <td>Asia Model Awards</td>
+
+          <td></td>
+        </tr>
+
+        <!-- Add more awards here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function filterAwards() {
+      var yearFilter = document.getElementById("yearFilter").value;
+      var categoryFilter = document.getElementById("categoryFilter").value;
+      var rows = document.querySelectorAll("tbody tr");
+      
+      rows.forEach(function(row) {
+        var year = row.getAttribute("data-year");
+        var category = row.getAttribute("data-category");
+        
+        if ((yearFilter === "all" || yearFilter === year) && (categoryFilter === "all" || categoryFilter === category)) {
+          row.style.display = "table-row";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    }
+  </script>
+</body>
+</html>

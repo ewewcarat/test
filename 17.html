@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seventeen 演唱會紀錄</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    .title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 32px;
+      color: #333;
+    }
+    .year-container {
+      display: flex;
+      flex-direction: column; /* 將排列方向改為垂直 */
+      align-items: center; /* 讓容器在水平方向上居中 */
+    }
+    .year {
+      margin: 30px;
+      padding: 50px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.1s ease;
+      cursor: pointer;
+      width: 700px; /* 設置容器寬度 */
+    }
+    .year:hover {
+      transform: scale(1.3);
+    }
+  </style>
+</head>
+<body>
+  <h1 class="title">演唱會紀錄</h1>
+  <div class="year-container">
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN Anyone Audio.mp3')" onmouseout="pauseAudio()">
+      <h2>2016</h2>
+      <p>Seventeen 1st Asia Tour "Shining Diamonds"</p>
+      <ul>
+        <li>7月30日：首爾，韓國 - Olympic Hall</li>
+        <li>8月13日：札幌，日本 - Zepp Sapporo</li>
+        <li>8月18日：橫濱，日本 - Pacifico Yokohama National Convention Hall</li>
+        <li>8月20日：名古屋，日本 - Zepp Nagoya</li>
+        <li>8月26日：福岡，日本 - Zepp Fukuoka</li>
+        <li>8月27日：大阪，日本 - Zepp Namba</li>
+        <li>8月29日：新加坡 - Suntec Singapore Convention and Exhibition Centre</li>
+        <li>9月3日：香港 - AsiaWorld–Expo Hall 10</li>
+        <li>9月11日：雅加達，印度尼西亞 - ICE BSD</li>
+        <li>9月29日：馬尼拉，菲律賓 - The Theatre at Solaire</li>
+      </ul>
+    </div>
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN HOT Lyrics 세븐틴 HOT 가사 Color Coded Lyrics.mp3')" onmouseout="pauseAudio()">
+      <h2>2017</h2>
+       <p>Seventeen 1st World Tour "Diamond Edge"</p>
+      <ul>
+        <li>7月14-16日：首爾，韓國 - Jamsil Auxiliary Stadium</li>
+        <li>7月26-27日：埼玉，日本 - Saitama Super Arena</li>
+        <li>8月5日：曼谷，泰國 - Thunder Dome</li>
+        <li>8月12日：香港 - AsiaWorld–Expo Hall 10</li>
+        <li>8月18日：芝加哥，美國 - Rosemont Theatre</li>
+        <li>8月23日：達拉斯，美國 - Verizon Theatre at Grand Prairie</li>
+        <li>8月25日：多倫多，加拿大 - Massey Hall</li>
+        <li>8月27日：紐約，美國 - Terminal 5</li>
+        <li>8月29日：聖地亞哥，智利 - Movistar Arena</li>
+        <li>9月9日：吉隆坡，馬來西亞 - Stadium Negara</li>
+        <li>9月23日：雅加達，印度尼西亞 - ICE Hall 3A</li>
+        <li>9月29日：新加坡 - Suntec Singapore Convention and Exhibition Centre </li>
+        <li>10月1日：台北，台灣 - Xinzhuang Gymnasium</li>
+        <li>10月6日：帕賽，菲律賓 - Mall of Asia Arena</li>
+
+      </ul>
+
+    </div>
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN Super Audio.mp3')" onmouseout="pauseAudio()">
+      <h2>2018</h2>
+       <p>Seventeen 2018 Japan Arena Tour 'SVT'</p>
+      <ul>
+        <li>2月21-22日：橫濱，日本 - Yokohama Arena</li>
+        <li>2月27-28日：大阪，日本 - Osaka-jō Hall</li>
+        <li>3月6-7日：名古屋，日本 - NGK Hall</li>
+      </ul>
+       <p>Seventeen Concert 'Ideal Cut'</p>
+      <ul>
+        <li>6月28-30日：首爾，韓國 - Jamsil Arena</li>
+        <li>8月18-19日：香港 - AsiaWorld–Expo Hall 10</li>
+        <li>8月25日：吉隆坡，馬來西亞 - Stadium Negara</li>
+        <li>9月4日：馬尼拉，菲律賓 - Mall of Asia Arena</li>
+        <li>9月21-23日：雅加達，印度尼西亞 - Indonesia Convention Exhibition</li>
+        <li>10月6-7日：新加坡 - Singapore Indoor Stadium</li>
+        <li>11月4日：台北，台灣 - Xinzhuang Gymnasium</li>
+      </ul>
+
+
+    </div>
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN MAESTRO Lyrics 세븐틴 MAESTRO 가사 Color Coded Lyrics.mp3')" onmouseout="pauseAudio()">
+      <h2>2019</h2>
+      <p>Seventeen 2019 Japan Tour 'Haru'</p>
+      <ul>
+        <li>4月2-3日：福岡，日本 - Fukuoka Convention Center</li>
+        <li>4月6-7日：札幌，日本 - Hokkaido Prefectural Sports Center</li>
+        <li>4月9-10日：名古屋，日本 - Nippon Gaishi Hall</li>
+        <li>4月20-21日：大阪，日本 - Osaka-jō Hall</li>
+        <li>4月27-28日：橫濱，日本 - Yokohama Arena</li>
+      </ul>
+    </div>
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN God Of Music Lyrics 세븐틴 음악의 신 가사 Color Coded Lyrics.mp3')" onmouseout="pauseAudio()">
+      <h2>2020</h2>
+       <p>Seventeen World Tour "Ode To You"</p>
+      <ul>
+        <li>8月8日：馬尼拉，菲律賓 - Mall of Asia Arena</li>
+        <li>8月10日：雅加達，印度尼西亞 - Indonesia Convention Exhibition (ICE)</li>
+        <li>8月16日：曼谷，泰國 - Impact Arena</li>
+        <li>8月17日：吉隆坡，馬來西亞 - Axiata Arena</li>
+        <li>8月24日：台北，台灣 - Taipei Nangang Exhibition Center</li>
+        <li>8月30日：新加坡 - Singapore Indoor Stadium</li>
+        <li>9月7日：香港 - AsiaWorld–Expo Hall 10</li>
+ 
+      </ul>
+    </div>
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN 세븐틴 Very NICE 아주 NICE Color Coded Lyrics Han Rom Eng.mp3')" onmouseout="pauseAudio()">
+      <h2>2022</h2>
+      <p>Seventeen 2022 Japan Dome Tour "Be The Sun"</p>
+      <ul>
+        <li>11月19-20日：大阪，日本 - Kyocera Dome Osaka</li>
+        <li>11月26-27日：東京，日本 - Tokyo Dome</li>
+        <li>12月3-4日：名古屋，日本 - Vantelin Dome Nagoya</li>
+       </ul>
+    </div>
+    <div class="year" onmouseover="playAudio('music/SEVENTEEN Rock With You Lyrics 세븐틴 Rock With You 가사 Color Coded Lyrics.mp3')" onmouseout="pauseAudio()">
+      <h2>2023</h2>
+      <p>Seventeen Tour "Follow"</p>
+      <ul>
+        <li>7月21-22日：首爾，韓國 - Gocheok Sky Dome</li>
+        <li>9月6日：東京，日本 - Tokyo Dome</li>
+        <li>9月23-24日：札幌，日本 - Hokkaido Prefectural Sports Center</li>
+        <li>10月7-8日：名古屋，日本 - Nippon Gaishi Hall</li>
+        <li>10月14-15日：大阪，日本 - Kyocera Dome Osaka</li>
+        <li>11月18-19日：福岡，日本 - PayPay Dome</li>
+        <li>12月17日：馬尼拉，菲律賓 - Philippine Arena</li>
+
+      </ul>
+
+    </div>
+    <div class="year" onmouseover="playAudio('music/Fallin Flower Korean Ver.mp3')" onmouseout="pauseAudio()">
+      <h2>2024</h2>
+      <p>Seventeen World Tour 2024</p>
+      <ul>
+        <li>5月18-19日：大阪，日本 - Yanmar Stadium Nagai</li>
+        <li>5月25-26日：橫濱，日本 - Nissan Stadium</li>
+       </ul>
+    </div>
+  </div>
+
+  <script>
+    let audio = new Audio();
+    let isPlaying = false;
+    let audioTime = 0;
+
+    function playAudio(src) {
+      if (!isPlaying || audio.src !== src) {
+        audio.src = src;
+        audio.currentTime = 0;
+        audio.play();
+        isPlaying = true;
+      }
+    }
+
+    function pauseAudio() {
+      if (isPlaying) {
+        audioTime = audio.currentTime;
+        audio.pause();
+        isPlaying = false;
+      }
+    }
+  </script>
+</body>
+</html>
