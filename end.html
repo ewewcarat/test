@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Electronic City Monitoring Terminal</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:monospace;
+background:black;
+color:#00ffc3;
+overflow:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:0;
+}
+
+.container{
+position:relative;
+z-index:2;
+width:720px;
+margin:auto;
+margin-top:60px;
+padding:30px;
+background:rgba(10,20,30,0.9);
+border:1px solid #00ffc3;
+box-shadow:0 0 20px #00ffc3;
+}
+
+h1{
+text-align:center;
+}
+
+.question{
+margin-top:20px;
+}
+
+select,button{
+margin-top:10px;
+padding:8px;
+background:black;
+color:#00ffc3;
+border:1px solid #00ffc3;
+}
+
+button{
+cursor:pointer;
+margin-right:10px;
+}
+
+#processing{
+display:none;
+text-align:center;
+}
+
+#result{
+display:none;
+}
+
+.card{
+border:1px solid #00ffc3;
+padding:20px;
+margin-top:20px;
+background:rgba(0,0,0,0.7);
+}
+
+#citizenCard h3{
+text-align:center;
+margin-bottom:15px;
+}
+
+#qrcode{
+margin-top:20px;
+}
+
+.actions{
+margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+
+<h1>Electronic City Monitoring Terminal</h1>
+
+<div id="inputStage">
+
+<h3>Consumption Pattern Scan</h3>
+
+<div class="question">
+<p>1. How many smartphones have you used in the last 5 years?</p>
+<select id="phones">
+<option value="2">1-2</option>
+<option value="4">3-4</option>
+<option value="6">5+</option>
+</select>
+</div>
+
+<div class="question">
+<p>2. How often do you replace your phone?</p>
+<select id="cycle">
+<option value="2">1-2 years</option>
+<option value="3">3-4 years</option>
+<option value="5">5+ years</option>
+</select>
+</div>
+
+<div class="question">
+<p>3. What do you do when a phone breaks?</p>
+<select id="repair">
+<option value="0">Buy new phone</option>
+<option value="1">Consider repair</option>
+<option value="2">Repair first</option>
+</select>
+</div>
+
+<div class="question">
+<p>4. What do you do with old phones?</p>
+<select id="recycle">
+<option value="0">Throw away / keep</option>
+<option value="1">Sell / give away</option>
+<option value="2">Recycle</option>
+</select>
+</div>
+
+<button onclick="startSimulation()">Start Simulation</button>
+
+</div>
+
+<div id="processing">
+
+<h2>Processing Global Data...</h2>
+<p id="status">Connecting global network...</p>
+<p id="progress">0%</p>
+
+</div>
+
+<div id="result">
+
+<h2>Simulation Result</h2>
+
+<div class="card" id="citizenCard"></div>
+
+<div id="qrcode"></div>
+
+<div class="actions">
+<button onclick="downloadCard()">Download Citizen Card</button>
+<button onclick="restart()">Restart</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function startSimulation(){
+
+let phones=parseInt(document.getElementById("phones").value)
+let cycle=parseInt(document.getElementById("cycle").value)
+let repair=parseInt(document.getElementById("repair").value)
+let recycle=parseInt(document.getElementById("recycle").value)
+
+document.getElementById("inputStage").style.display="none"
+document.getElementById("processing").style.display="block"
+
+let progress=0
+
+let interval=setInterval(function(){
+
+progress+=10
+document.getElementById("progress").innerText=progress+"%"
+
+if(progress==30){
+document.getElementById("status").innerText="Loading population data..."
+}
+
+if(progress==60){
+document.getElementById("status").innerText="Simulating waste generation..."
+}
+
+if(progress==90){
+document.getElementById("status").innerText="Calculating impact..."
+}
+
+if(progress>=100){
+
+clearInterval(interval)
+showResult(phones,cycle,repair,recycle)
+
+}
+
+},400)
+
+}
+
+function showResult(phones,cycle,repair,recycle){
+
+document.getElementById("processing").style.display="none"
+document.getElementById("result").style.display="block"
+
+let score = phones*2 - cycle + (2-repair) + (2-recycle)
+
+let type=""
+
+if(score>=6){
+type="Tech Chaser"
+}
+else if(score>=3){
+type="Practical User"
+}
+else{
+type="Repair Advocate"
+}
+
+let waste = (phones*0.2 + (2-repair)*0.1)*10
+
+let impact=""
+
+if(waste>6){
+impact="High Risk Zone"
+}
+else if(waste>3){
+impact="Moderate Impact"
+}
+else{
+impact="Low Impact"
+}
+
+let citizenID="EC-"+Math.floor(Math.random()*90000+10000)
+
+let resultText=
+`Citizen ID: ${citizenID}
+Type: ${type}
+Waste: ${waste.toFixed(2)} kg
+Impact: ${impact}`
+
+document.getElementById("citizenCard").innerHTML=
+
+`<h3>Electronic City Digital Citizen Card</h3>
+<p><b>Citizen ID:</b> ${citizenID}</p>
+<p><b>Citizen Type:</b> ${type}</p>
+<p><b>Phones Used:</b> ${phones}</p>
+<p><b>Replacement Cycle:</b> ${cycle} years</p>
+<p><b>Estimated E-Waste:</b> ${waste.toFixed(2)} kg</p>
+<p><b>Impact Level:</b> ${impact}</p>`
+
+document.getElementById("qrcode").innerHTML=""
+
+new QRCode(document.getElementById("qrcode"),{
+text:resultText,
+width:160,
+height:160
+})
+
+}
+
+function downloadCard(){
+
+let card=document.getElementById("citizenCard")
+
+html2canvas(card).then(canvas=>{
+
+let link=document.createElement("a")
+link.download="ElectronicCityCitizenCard.png"
+link.href=canvas.toDataURL()
+
+link.click()
+
+})
+
+}
+
+function restart(){
+location.reload()
+}
+
+/* MATRIX BACKGROUND */
+
+const canvas=document.getElementById("matrix")
+const ctx=canvas.getContext("2d")
+
+canvas.height=window.innerHeight
+canvas.width=window.innerWidth
+
+const letters="01電子城市DATA"
+const fontSize=14
+const columns=canvas.width/fontSize
+
+const drops=[]
+
+for(let i=0;i<columns;i++){
+drops[i]=1
+}
+
+function draw(){
+
+ctx.fillStyle="rgba(0,0,0,0.05)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+ctx.fillStyle="#00ffc3"
+ctx.font=fontSize+"px monospace"
+
+for(let i=0;i<drops.length;i++){
+
+const text=letters[Math.floor(Math.random()*letters.length)]
+
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
+
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975){
+drops[i]=0
+}
+
+drops[i]++
+
+}
+
+}
+
+setInterval(draw,33)
+
+</script>
+
+</body>
+</html>
