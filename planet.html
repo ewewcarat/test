@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celestial Core V2 - 爆震環與巨量粒子</title>
+    <!-- 核心庫引入 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; }
+
+        /* 右下角追蹤視窗 */
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            border: 2px solid #ff4400;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #111;
+            z-index: 100;
+        }
+        #input-video { display: none; }
+        #output-canvas { width: 100%; height: 100%; transform: scaleX(-1); }
+
+        /* 提示資訊 */
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(0,0,0,1);
+            z-index: 10;
+        }
+        .gesture-hint {
+            font-size: 13px;
+            background: rgba(255,68,0,0.2);
+            padding: 12px;
+            border-left: 3px solid #ff4400;
+            margin-top: 10px;
+            backdrop-filter: blur(8px);
+        }
+        #debug-status { font-weight: bold; color: #ffcc00; font-size: 1.2em; }
+
+        /* AI 功能面板 */
+        #ai-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 68, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .ai-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ff4400, #ffaa00);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 68, 0, 0.3);
+        }
+        .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 68, 0, 0.5); }
+        .ai-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #ai-response {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #eee;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ff4400;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #222;
+            border-top-color: #ff4400;
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="load-msg">宇宙奇點準備中...</div>
+    </div>
+
+    <div id="info-panel">
+        <h2 style="margin:0; color:#ff4400; letter-spacing: 3px;">GALACTIC X</h2>
+        <div id="debug-status">正在掃描星系環境...</div>
+        <div class="gesture-hint">
+            <b>物理指令：</b><br>
+            • ✊ <b>握拳：</b> 萬有引力，重組星球並開啟穿梭流光<br>
+            • 🖐️ <b>張開：</b> 超新星爆發，粒子變大並釋放震盪環<br>
+            • 📍 <b>移動：</b> 改變觀察視角
+        </div>
+    </div>
+
+    <div id="ai-panel">
+        <button id="btn-describe" class="ai-btn">✨ 觀測演化日誌</button>
+        <button id="btn-explore" class="ai-btn">✨ 宇宙導覽語音</button>
+        <div id="ai-response">準備與 Gemini AI 連線，解析目前的宇宙狀態...</div>
+    </div>
+
+    <div id="ui-container">
+        <video id="input-video"></video>
+        <canvas id="output-canvas"></canvas>
+    </div>
+
+    <script>
+        const apiKey = ""; 
+
+        let scene, camera, renderer, globe, warpStreaks, shockwaves = [];
+        let videoElement, canvasElement, canvasCtx;
+        let handTracker;
+        
+        let targetRotX = 0, targetRotY = 0;
+        let currentRotX = 0, currentRotY = 0;
+        
+        // 粒子系統狀態
+        let particles = [];
+        let isExploded = false;
+        let explosionFactor = 0;
+        let warpIntensity = 0;
+        
+        const PARTICLE_COUNT = 25000;
+        const GLOBE_RADIUS = 5;
+        const STREAK_COUNT = 800;
+
+        function initScene() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 4000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            // 1. 初始化星球粒子
+            const globeGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(PARTICLE_COUNT * 3);
+            const colors = new Float32Array(PARTICLE_COUNT * 3);
+            
+            for(let i=0; i<PARTICLE_COUNT; i++) {
+                const u = Math.random();
+                const v = Math.random();
+                const theta = 2 * Math.PI * u;
+                const phi = Math.acos(2 * v - 1);
+                const r = GLOBE_RADIUS * (0.85 + Math.random() * 0.3);
+                
+                const x = r * Math.sin(phi) * Math.cos(theta);
+                const y = r * Math.sin(phi) * Math.sin(theta);
+                const z = r * Math.cos(phi);
+
+                positions[i*3] = x;
+                positions[i*3+1] = y;
+                positions[i*3+2] = z;
+
+                const mix = Math.random();
+                colors[i*3] = 1.0; 
+                colors[i*3+1] = mix > 0.8 ? 1.0 : 0.2 + Math.random() * 0.5; 
+                colors[i*3+2] = mix > 0.8 ? 0.9 : Math.random() * 0.2;
+
+                particles.push({
+                    baseX: x, baseY: y, baseZ: z,
+                    vx: x / r, vy: y / r, vz: z / r,
+                    speed: 0.5 + Math.random() * 2.5
+                });
+            }
+
+            globeGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            globeGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const globeMat = new THREE.PointsMaterial({
+                size: 0.08, 
+                vertexColors: true,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                opacity: 0.85
+            });
+            
+            globe = new THREE.Points(globeGeo, globeMat);
+            scene.add(globe);
+
+            // 2. 初始化穿梭流光
+            const streakGeo = new THREE.BufferGeometry();
+            const streakPos = new Float32Array(STREAK_COUNT * 3);
+            for(let i=0; i<STREAK_COUNT; i++) {
+                streakPos[i*3] = (Math.random() - 0.5) * 60;
+                streakPos[i*3+1] = (Math.random() - 0.5) * 60;
+                streakPos[i*3+2] = Math.random() * -1000;
+            }
+            streakGeo.setAttribute('position', new THREE.BufferAttribute(streakPos, 3));
+            const streakMat = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.15,
+                transparent: true,
+                opacity: 0,
+                blending: THREE.AdditiveBlending
+            });
+            warpStreaks = new THREE.Points(streakGeo, streakMat);
+            scene.add(warpStreaks);
+
+            // 3. 初始化爆炸白色圓環 (Shockwaves)
+            const shockwaveCount = 2;
+            for(let j=0; j<shockwaveCount; j++) {
+                const ringCount = 2000;
+                const ringGeo = new THREE.BufferGeometry();
+                const ringPos = new Float32Array(ringCount * 3);
+                for(let i=0; i<ringCount; i++) {
+                    const angle = (i / ringCount) * Math.PI * 2;
+                    const r = 1 + (Math.random() * 0.1);
+                    ringPos[i*3] = Math.cos(angle) * r;
+                    ringPos[i*3+1] = Math.sin(angle) * r;
+                    ringPos[i*3+2] = (Math.random() - 0.5) * 0.5;
+                }
+                ringGeo.setAttribute('position', new THREE.BufferAttribute(ringPos, 3));
+                const ringMat = new THREE.PointsMaterial({
+                    color: 0xffffff,
+                    size: 0.12,
+                    transparent: true,
+                    opacity: 0,
+                    blending: THREE.AdditiveBlending
+                });
+                const ring = new THREE.Points(ringGeo, ringMat);
+                ring.rotation.x = Math.random() * Math.PI;
+                ring.rotation.y = Math.random() * Math.PI;
+                scene.add(ring);
+                shockwaves.push({ mesh: ring, scale: 1 });
+            }
+
+            camera.position.z = 25;
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const posAttr = globe.geometry.attributes.position;
+            
+            if (isExploded) {
+                explosionFactor += (65 - explosionFactor) * 0.05;
+                warpIntensity += (0 - warpIntensity) * 0.1;
+                globe.material.size += (0.25 - globe.material.size) * 0.1;
+            } else {
+                explosionFactor += (0 - explosionFactor) * 0.12;
+                warpIntensity += (1 - warpIntensity) * 0.05;
+                globe.material.size += (0.08 - globe.material.size) * 0.1;
+            }
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const p = particles[i];
+                let tx = p.baseX;
+                let ty = p.baseY;
+                let tz = p.baseZ;
+                if (explosionFactor > 0.01) {
+                    tx += p.vx * explosionFactor * p.speed;
+                    ty += p.vy * explosionFactor * p.speed;
+                    tz += p.vz * explosionFactor * p.speed;
+                }
+                posAttr.array[i*3] = tx;
+                posAttr.array[i*3+1] = ty;
+                posAttr.array[i*3+2] = tz;
+            }
+            posAttr.needsUpdate = true;
+
+            shockwaves.forEach((sw, idx) => {
+                if(isExploded) {
+                    sw.scale += (50 - sw.scale) * (0.02 + idx * 0.01);
+                    sw.mesh.scale.set(sw.scale, sw.scale, sw.scale);
+                    sw.mesh.material.opacity = Math.max(0, (1 - sw.scale / 50) * 0.8);
+                } else {
+                    sw.scale = 1;
+                    sw.mesh.scale.set(1, 1, 1);
+                    sw.mesh.material.opacity = 0;
+                }
+            });
+
+            const streakPos = warpStreaks.geometry.attributes.position;
+            warpStreaks.material.opacity = warpIntensity * 0.6;
+            if (warpIntensity > 0.01) {
+                for (let i = 0; i < STREAK_COUNT; i++) {
+                    streakPos.array[i*3+2] += 15 * warpIntensity; 
+                    if (streakPos.array[i*3+2] > 50) {
+                        streakPos.array[i*3+2] = -800 - Math.random() * 200;
+                        streakPos.array[i*3] = (Math.random() - 0.5) * 80;
+                        streakPos.array[i*3+1] = (Math.random() - 0.5) * 80;
+                    }
+                }
+                streakPos.needsUpdate = true;
+            }
+
+            currentRotY += (targetRotY - currentRotY) * 0.1;
+            currentRotX += (targetRotX - currentRotX) * 0.1;
+            globe.rotation.y = currentRotY + Date.now() * 0.0005;
+            globe.rotation.x = currentRotX;
+            warpStreaks.rotation.y = currentRotY * 0.5;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- MediaPipe & 手勢偵測 (優化相機選擇) ---
+        async function initTracking() {
+            videoElement = document.getElementById('input-video');
+            canvasElement = document.getElementById('output-canvas');
+            canvasCtx = canvasElement.getContext('2d');
+            const debugText = document.getElementById('debug-status');
+
+            handTracker = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            handTracker.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.75,
+                minTrackingConfidence: 0.75
+            });
+
+            handTracker.onResults(results => {
+                canvasCtx.save();
+                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+                if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    const marks = results.multiHandLandmarks[0];
+                    drawConnectors(canvasCtx, marks, HAND_CONNECTIONS, {color: '#ff4400', lineWidth: 3});
+                    targetRotY = (0.5 - marks[0].x) * 3;
+                    targetRotX = (marks[0].y - 0.5) * 1.5;
+                    const isFist = checkFist(marks);
+                    if (isFist) {
+                        isExploded = false;
+                        debugText.innerText = "✊ 引力凝聚：超空間穿梭模式";
+                        debugText.style.color = "#00ffff";
+                    } else {
+                        isExploded = true;
+                        debugText.innerText = "💥 能量爆發：超新星爆發中";
+                        debugText.style.color = "#ff4400";
+                    }
+                } else {
+                    debugText.innerText = "正在掃描星際環境...";
+                    debugText.style.color = "#ffcc00";
+                }
+                canvasCtx.restore();
+            });
+
+            try {
+                // 1. 取得所有視訊設備
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                let selectedDeviceId = null;
+                
+                // 2. 邏輯過濾：尋找電腦內建鏡頭 (Built-in, FaceTime, Integrated) 並排除 iPhone/虛擬鏡頭
+                const builtIn = videoDevices.find(d => 
+                    (d.label.toLowerCase().includes('built-in') || 
+                     d.label.toLowerCase().includes('facetime') || 
+                     d.label.toLowerCase().includes('integrated') ||
+                     d.label.toLowerCase().includes('camera')) && 
+                    !d.label.toLowerCase().includes('iphone') &&
+                    !d.label.toLowerCase().includes('virtual')
+                );
+
+                if (builtIn) {
+                    selectedDeviceId = builtIn.deviceId;
+                    console.log("已自動選擇內建鏡頭:", builtIn.label);
+                } else if (videoDevices.length > 0) {
+                    selectedDeviceId = videoDevices[0].deviceId;
+                }
+
+                // 3. 調用指定的設備
+                const constraints = {
+                    video: selectedDeviceId ? { deviceId: { exact: selectedDeviceId }, width: 640, height: 480 } : { width: 640, height: 480 }
+                };
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                videoElement.srcObject = stream;
+                videoElement.play();
+                
+                async function processVideo() {
+                    await handTracker.send({ image: videoElement });
+                    requestAnimationFrame(processVideo);
+                }
+                videoElement.onloadeddata = () => {
+                    document.getElementById('loader').style.display = 'none';
+                    processVideo();
+                };
+            } catch (err) {
+                console.error("相機啟動錯誤:", err);
+                document.getElementById('load-msg').innerText = "攝像頭存取失敗";
+            }
+        }
+
+        function checkFist(marks) {
+            const d8 = Math.hypot(marks[8].x - marks[0].x, marks[8].y - marks[0].y);
+            const d12 = Math.hypot(marks[12].x - marks[0].x, marks[12].y - marks[0].y);
+            const d16 = Math.hypot(marks[16].x - marks[0].x, marks[16].y - marks[0].y);
+            const d20 = Math.hypot(marks[20].x - marks[0].x, marks[20].y - marks[0].y);
+            return (d8 + d12 + d16 + d20) / 4 < 0.35;
+        }
+
+        // --- Gemini API 功能 ---
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return await response.json();
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                }
+                await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
+            }
+        }
+
+        async function describePlanet() {
+            const display = document.getElementById('ai-response');
+            const btn = document.getElementById('btn-describe');
+            display.innerText = "Gemini 解析能量環數據中...";
+            btn.disabled = true;
+            let currentState = isExploded ? "超新星爆發，白色激波環正向外擴張，粒子體積激增" : "星球重組穩定，白色流光穿梭於虛空";
+            const prompt = `你是一位宇宙觀察員。感應器顯示目前狀態：${currentState}。請以此寫一段約 100 字的觀測報告，強調爆炸瞬間的震撼與爆震環的壯觀。`;
+            try {
+                const result = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                display.innerText = result.candidates?.[0]?.content?.parts?.[0]?.text || "傳訊中斷。";
+            } catch (error) { display.innerText = "通訊故障。"; } finally { btn.disabled = false; }
+        }
+
+        async function exploreWithVoice() {
+            const display = document.getElementById('ai-response');
+            const btn = document.getElementById('btn-explore');
+            display.innerText = "語音導覽鏈接中...";
+            btn.disabled = true;
+            let textPrompt = isExploded 
+                ? "請用極度震撼的口吻描述超新星爆發，提到白色圓環狀的激波正在摧毀周圍的一切空間。" 
+                : "請用充滿科技感的語氣，描述白色流光穿梭，星球重新凝聚回歸的景象。";
+            try {
+                const textResult = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: textPrompt }] }] })
+                });
+                const responseText = textResult.candidates?.[0]?.content?.parts?.[0]?.text || "宇宙正在重塑。";
+                display.innerText = responseText;
+                const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                const ttsResponse = await fetch(ttsUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: "Say this with Traditional Chinese: " + responseText }] }],
+                        generationConfig: {
+                            responseModalities: ["AUDIO"],
+                            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } }
+                        }
+                    })
+                });
+                const ttsData = await ttsResponse.json();
+                playPCM(ttsData.candidates[0].content.parts[0].inlineData.data);
+            } catch (error) { display.innerText = "語音離線。"; } finally { btn.disabled = false; }
+        }
+
+        function playPCM(base64Data) {
+            const binaryString = atob(base64Data);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+            const sampleRate = 24000;
+            const wavHeader = new ArrayBuffer(44);
+            const view = new DataView(wavHeader);
+            const writeString = (offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + len, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, len, true);
+            const blob = new Blob([wavHeader, bytes], { type: 'audio/wav' });
+            const audio = new Audio(URL.createObjectURL(blob));
+            audio.play();
+        }
+
+        document.getElementById('btn-describe').onclick = describePlanet;
+        document.getElementById('btn-explore').onclick = exploreWithVoice;
+
+        window.onload = () => {
+            initScene();
+            initTracking();
+        };
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
