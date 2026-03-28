@@ -1,0 +1,227 @@
+import React, { useRef, useEffect } from 'react';
+import  as THREE from 'three';
+
+const App = () = {
+  const containerRef = useRef();
+
+   頂點著色器：加入零件高度擠出與動態掃描波
+  const vertexShader = `
+    uniform float uTime;
+    attribute float aSize;
+    attribute vec3 aColor;
+    attribute float aType;  0基板, 1走線, 2IC芯片, 3電子元件, 4金屬接口
+    varying vec3 vColor;
+    varying float vAlpha;
+    varying float vType;
+
+    void main() {
+      vColor = aColor;
+      vType = aType;
+      vec3 pos = position;
+      
+       模擬照片中的零件高度 (Z軸擠出)
+      if(aType == 2.0) pos.z += 0.25;  中央IC稍微隆起
+      if(aType == 3.0) pos.z += 0.15;  小零件
+      if(aType == 4.0) pos.z += 0.4;   連接器槽高度
+
+       動態掃描光波
+      float scan = sin(pos.x  0.5 + pos.y  0.5 + uTime  2.0);
+      if(scan  0.95) {
+        vColor += vec3(0.2, 0.4, 0.5);  掃描時帶點藍色螢光
+      }
+
+      vec4 mvPosition = modelViewMatrix  vec4(pos, 1.0);
+      gl_Position = projectionMatrix  mvPosition;
+      gl_PointSize = aSize  (700.0  -mvPosition.z);
+      vAlpha = 1.0;
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+    varying vec3 vColor;
+    varying float vAlpha;
+    varying float vType;
+
+    void main() {
+      vec2 uv = gl_PointCoord - vec2(0.5);
+      float dist = length(uv)  2.0;
+      
+      float core = 1.0 - smoothstep(0.4, 0.5, dist);
+      float tail = exp(-dist  dist  6.0);
+      
+       根據零件類型調整發光感
+      float intensity = core  1.2 + tail  0.8;
+      if(vType  1.5) intensity = 1.3;  零件比基板更亮一點
+
+      gl_FragColor = vec4(vColor  intensity, vAlpha);
+    }
+  `;
+
+  useEffect(() = {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x010305);
+
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth  window.innerHeight, 0.1, 1000);
+    camera.position.set(6, -7, 7);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    containerRef.current.appendChild(renderer.domElement);
+
+     粒子生成邏輯：模仿照片佈局
+    const count = 250000;  增加粒子量以呈現細節
+    const geometry = new THREE.BufferGeometry();
+    const pos = new Float32Array(count  3);
+    const col = new Float32Array(count  3);
+    const size = new Float32Array(count);
+    const type = new Float32Array(count);
+
+    const cPCB = new THREE.Color(0x0a1a1f);      深藍基板
+    const cCopper = new THREE.Color(0xcc6633);   銅色走線
+    const cIC = new THREE.Color(0x111111);       IC黑
+    const cMetal = new THREE.Color(0x99aabb);    金屬焊點
+    const cGold = new THREE.Color(0xffaa00);     金色零件
+
+    for (let i = 0; i  count; i++) {
+      let x = (Math.random() - 0.5)  12;
+      let y = (Math.random() - 0.5)  10;
+      let z = 0;
+      let pCol = cPCB.clone();
+      let pSize = 0.008 + Math.random()  0.01;
+      let pType = 0.0;
+
+       1. 中央 IC 芯片區域 (照片中間的黑方塊)
+      if (Math.abs(x - 0.5)  1.0 && Math.abs(y + 0.5)  1.0) {
+        pCol = cIC.clone();
+        pType = 2.0;
+        pSize = 1.5;
+      }
+       2. 左側連接器區域 (照片左邊的長型槽)
+      else if (x  -3.5) {
+        pCol = new THREE.Color(0x050505);
+        pType = 4.0;
+         模擬槽位間隙
+        if (Math.abs(Math.sin(y  10.0))  0.7) {
+            pCol = cMetal.clone();
+            pSize = 1.2;
+        }
+      }
+       3. 右上方晶體振盪器 (照片右上金屬件)
+      else if (x  3.0 && y  2.0 && Math.abs(x - 4.0)  0.6 && Math.abs(y - 3.0)  0.4) {
+        pCol = cMetal.clone().lerp(cGold, 0.3);
+        pType = 3.0;
+        pSize = 2.0;
+      }
+       4. 走線與 SMD 零件
+      else {
+         模擬照片中 45 度與水平的走線幾何
+        const isTrace = Math.abs(Math.sin((x + y)  8.0))  0.97  
+                        Math.abs(Math.sin(y  12.0))  0.98;
+        
+        if (isTrace) {
+          pCol = cCopper.clone().lerp(cGold, Math.random()  0.2);
+          pSize = 1.3;
+          pType = 1.0;
+        }
+
+         隨機分佈的小型 SMD 元件 (電阻、電容)
+        if (Math.random()  0.995) {
+          pCol = Math.random()  0.5  cMetal  cGold;
+          pType = 3.0;
+          pSize = 2.5;
+        }
+      }
+
+      pos[i  3] = x;
+      pos[i  3 + 1] = y;
+      pos[i  3 + 2] = z;
+      col[i  3] = pCol.r;
+      col[i  3 + 1] = pCol.g;
+      col[i  3 + 2] = pCol.b;
+      size[i] = pSize;
+      type[i] = pType;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geometry.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+    geometry.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
+    geometry.setAttribute('aType', new THREE.BufferAttribute(type, 1));
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      transparent true,
+      blending THREE.AdditiveBlending,
+      depthWrite false,
+      uniforms { uTime { value 0 } }
+    });
+
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    const clock = new THREE.Clock();
+    const animate = () = {
+      const time = clock.getElapsedTime();
+      material.uniforms.uTime.value = time;
+      
+       緩慢旋轉增加層次感
+      points.rotation.z = time  0.03;
+      
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+    animate();
+
+    const handleResize = () = {
+      camera.aspect = window.innerWidth  window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () = {
+      window.removeEventListener('resize', handleResize);
+      renderer.dispose();
+    };
+  }, []);
+
+  return (
+    div className=relative w-full h-screen bg-[#010305] overflow-hidden
+      div ref={containerRef} className=absolute inset-0 
+      
+      { 移除拉桿，改為技術 HUD 標註 }
+      div className=absolute top-10 left-10 z-20 pointer-events-none font-mono
+        div className=flex items-center gap-2 mb-2
+          div className=w-2 h-2 bg-blue-500 animate-ping rounded-full 
+          span className=text-blue-400 text-[10px] tracking-[0.2em]LIVE_CIRCUIT_EMULATIONspan
+        div
+        h1 className=text-white text-4xl font-black tracking-tighter opacity-80
+          PCB_REPLICA span className=text-orange-500v3.0span
+        h1
+        div className=mt-6 space-y-2
+          div className=flex items-center gap-4 text-white40 text-[9px] border-l-2 border-orange-50050 pl-4
+            divOBJECT MULTI-LAYER_BOARDdiv
+            div className=text-orange-40060SCAN 100% SUCCESSdiv
+          div
+          div className=flex items-center gap-4 text-white40 text-[9px] border-l-2 border-blue-50050 pl-4
+            divPARTS QFP_100  XTAL  SMD_ARRAYdiv
+            div className=text-blue-40060SYNC 60FPSdiv
+          div
+        div
+      div
+
+      { 裝飾性網格 }
+      div className=absolute inset-0 pointer-events-none opacity-5
+        style={{
+          backgroundImage `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
+          backgroundSize '40px 40px'
+        }} 
+      
+    div
+  );
+};
+
+export default App;
